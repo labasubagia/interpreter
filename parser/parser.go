@@ -2,9 +2,10 @@ package parser
 
 import (
 	"fmt"
-	"interpreter/ast"
-	"interpreter/lexer"
-	"interpreter/token"
+
+	"github.com/labasubagia/interpreter/ast"
+	"github.com/labasubagia/interpreter/lexer"
+	"github.com/labasubagia/interpreter/token"
 )
 
 type Parser struct {

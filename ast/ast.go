@@ -1,6 +1,6 @@
 package ast
 
-import "interpreter/token"
+import "github.com/labasubagia/interpreter/token"
 
 type Node interface {
 	TokenLiteral() string
