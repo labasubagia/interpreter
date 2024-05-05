@@ -61,6 +61,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
+	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -116,12 +117,12 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	stmt := &ast.LetStatement{Token: p.curToken}
 
-	if !p.expectToken(token.IDENT) {
+	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-	if !p.expectToken(token.ASSIGN) {
+	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 
@@ -212,6 +213,17 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	return expression
 }
 
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	// defer untrace(trace("parseGroupedExpression"))
+
+	p.nextToken()
+	exp := p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return exp
+}
+
 func (p *Parser) parseIntegerLiteral() ast.Expression {
 	// defer untrace(trace("parseIntegerLiteral"))
 
@@ -255,7 +267,7 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
-func (p *Parser) expectToken(t token.TokenType) bool {
+func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
 		return true
