@@ -28,6 +28,11 @@ func TestNextToken(t *testing.T) {
 
 		10 == 10;
 		9 != 10;
+		"foobar"
+		"foo bar"
+		"hello \"world\""
+		"hello\n world"
+		"hello\t\t\tworld"
 	`
 
 	tests := []struct {
@@ -114,6 +119,11 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 
+		{token.STRING, "foobar"},
+		{token.STRING, "foo bar"},
+		{token.STRING, `hello \"world\"`},
+		{token.STRING, `hello\n world`},
+		{token.STRING, `hello\t\t\tworld`},
 		{token.EOF, ""},
 	}
 
@@ -127,7 +137,7 @@ func TestNextToken(t *testing.T) {
 		}
 
 		if tok.Literal != tt.expectedLiteral {
-			t.Fatalf("tests[%d] - token literal wrong. expected=%q, got=%q", i, tt.expectedType, tok.Literal)
+			t.Fatalf("tests[%d] - token literal wrong. expected=%q, got=%q", i, tt.expectedLiteral, tok.Literal)
 		}
 	}
 }
