@@ -83,7 +83,6 @@ func (l *AssignStatement) TokenLiteral() string {
 
 func (l *AssignStatement) String() string {
 	var out bytes.Buffer
-	out.WriteString(l.TokenLiteral() + " ")
 	out.WriteString(l.Name.String())
 	out.WriteString(" = ")
 	if l.Value != nil {
