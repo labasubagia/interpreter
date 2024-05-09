@@ -35,6 +35,9 @@ func TestNextToken(t *testing.T) {
 		"hello\t\t\tworld"
 		[1, 2];
 		{"foo": "bar"};
+
+		10 <= 12;
+		5 >= 3;
 	`
 
 	tests := []struct {
@@ -139,6 +142,16 @@ func TestNextToken(t *testing.T) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+
+		{token.INT, "10"},
+		{token.LTE, "<="},
+		{token.INT, "12"},
+		{token.SEMICOLON, ";"},
+
+		{token.INT, "5"},
+		{token.GTE, ">="},
+		{token.INT, "3"},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
