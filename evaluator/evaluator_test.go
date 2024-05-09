@@ -388,6 +388,8 @@ func TestBuiltinFunctions(t *testing.T) {
 			`,
 			15,
 		},
+
+		{`puts("Hello", "World")`, nil},
 	}
 
 	for _, tt := range tests {

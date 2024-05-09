@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/labasubagia/interpreter/ast"
@@ -95,6 +96,20 @@ var builtins = map[string]*object.Builtin{
 			copy(newElements, arr.Elements)
 			newElements[length] = args[1]
 			return &object.Array{Elements: newElements}
+		},
+	},
+	"puts": {
+		Fn: func(args ...object.Object) object.Object {
+			var out bytes.Buffer
+			for i, arg := range args {
+				out.WriteString(arg.Inspect())
+				if i < len(args)-1 {
+					out.WriteString(" ")
+				}
+			}
+
+			fmt.Println(out.String())
+			return NULL
 		},
 	},
 }
