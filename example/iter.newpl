@@ -1,0 +1,38 @@
+let map = fn(arr, f) {
+    let iter = fn(arr, accumulated) {
+        if (len(arr) == 0) {
+            return accumulated;
+        }
+        return iter(
+            rest(arr), 
+            push(accumulated, f(first(arr)))
+        );
+    };
+    return iter(arr, []);
+};
+
+
+let filter = fn(arr, f) {
+    let iter = fn(arr, accumulated) {
+        if (len(arr) == 0) {
+            return accumulated;
+        }
+
+        let x =  first(arr);
+        if (f(x)) {
+            accumulated = push(accumulated, x);
+        }
+        return iter(rest(arr), accumulated);
+    };
+    return iter(arr, []);
+};
+
+
+let arr = [1,2,2,3,4];
+puts("original", arr);
+
+let filtered = filter(arr, fn(x) { x == 3 });
+puts("filtered", filtered);
+
+let squared = map(arr, fn(x) { x * x });
+puts("squared", squared);
