@@ -28,3 +28,16 @@ func (e *Environment) Set(name string, val Object) Object {
 	e.store[name] = val
 	return val
 }
+
+// Assign only if exists anywhere in inner or outer env
+func (e *Environment) Assign(name string, val Object) (value Object, found bool) {
+	env := e
+	for env != nil {
+		if _, ok := env.store[name]; ok {
+			env.store[name] = val
+			return val, true
+		}
+		env = env.outer
+	}
+	return val, false
+}

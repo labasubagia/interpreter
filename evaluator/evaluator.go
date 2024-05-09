@@ -125,6 +125,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
+	case *ast.AssignStatement:
+		val := Eval(node.Value, env)
+		if isError(val) {
+			return val
+		}
+		_, ok := env.Assign(node.Name.Value, val)
+		if !ok {
+			return newError("identifier not found: %s", node.Name.String())
+		}
+
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 	case *ast.PrefixExpression:

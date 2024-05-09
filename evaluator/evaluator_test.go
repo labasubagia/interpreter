@@ -207,6 +207,11 @@ func TestErrorHandling(t *testing.T) {
 			`{"name": "Monkey"}[fn(x) { x }];`,
 			"unusable as hash key: FUNCTION",
 		},
+
+		{
+			"foobar = 12;",
+			"identifier not found: foobar",
+		},
 	}
 
 	for _, tt := range tests {
@@ -233,6 +238,46 @@ func TestLetStatements(t *testing.T) {
 		{"let a = 5 * 5; a;", 25},
 		{"let a = 5; let b = a; b;", 5},
 		{"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+	}
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
+	}
+}
+
+func TestAssignStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let a = 5; a = 12; a;", 12},
+		{"let a = 5; a = 12; a = 13;  a;", 13},
+		{"let a = 5; a = 12; a = 5 * 5 + 5;  a;", 30},
+		{
+			`
+				let x = 12;
+				let f = fn() {
+					x = 50
+				}
+				f()
+				x
+			`,
+			50,
+		},
+		{
+			`
+				let x = 12;
+				let f = fn() {
+					x = 50
+					let fa = fn() {
+						x = 55
+					}
+					fa()
+				}
+				f()
+				x
+			`,
+			55,
+		},
 	}
 	for _, tt := range tests {
 		testIntegerObject(t, testEval(tt.input), tt.expected)

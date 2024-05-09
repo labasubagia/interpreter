@@ -121,6 +121,10 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 func (p *Parser) parseStatement() ast.Statement {
 	// defer untrace(trace("parseStatement"))
 
+	if p.curToken.Type == token.IDENT && p.peekToken.Type == token.ASSIGN {
+		return p.parseAssignStatement()
+	}
+
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
@@ -129,6 +133,27 @@ func (p *Parser) parseStatement() ast.Statement {
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseAssignStatement() ast.Statement {
+
+	stmt := &ast.AssignStatement{Token: token.Token{Type: token.ASSIGN, Literal: "="}}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	// find token.ASSIGN
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	for p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {

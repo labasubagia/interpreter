@@ -684,6 +684,29 @@ func TestParsingEmptyHashLiteral(t *testing.T) {
 	}
 }
 
+func TestAssignStatement(t *testing.T) {
+
+	input := "x = 5;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, ok := program.Statements[0].(*ast.AssignStatement)
+	if !ok {
+		t.Fatalf("exp is not ast.AssignStatement. got=%T", program.Statements[0])
+	}
+
+	if stmt.Name.String() != "x" {
+		t.Errorf("stmt.Name is not x. got=%q", stmt.Name.String())
+	}
+
+	if stmt.Value.String() != "5" {
+		t.Errorf("stmt.Value is not x. got=%q", stmt.Value.String())
+	}
+}
+
 func TestParsingHashLiteralsWithExpressions(t *testing.T) {
 	input := `{"one": 0 + 1, "two": 10 - 8, "three": 15 / 5}`
 
