@@ -8,12 +8,17 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `
+		# this is comment 1
+		# this is comment 2
+
 		let five = 5;
 		let ten = 10;
 
 		let add =  fn(x, y) {
 			x + y;
 		};
+
+		# this is comment 3
 
 		let result = add(five, ten);
 

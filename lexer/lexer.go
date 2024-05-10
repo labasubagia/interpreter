@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/labasubagia/interpreter/token"
+import (
+	"github.com/labasubagia/interpreter/token"
+)
 
 type Lexer struct {
 	input        string
@@ -18,7 +20,7 @@ func New(input string) *Lexer {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
-	l.skipWhitespace()
+	l.skipUnused()
 
 	switch l.ch {
 	case '=':
@@ -145,10 +147,21 @@ func (l *Lexer) peekChar() byte {
 	}
 }
 
-func (l *Lexer) skipWhitespace() {
-	for isWhitespace(l.ch) {
+func (l *Lexer) skipUnused() {
+	for isWhitespace(l.ch) || l.isComment() {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) isComment() bool {
+	if l.ch == '#' {
+		for l.ch != '\n' || l.ch == 0 {
+			l.readChar()
+		}
+		l.readChar()
+		return true
+	}
+	return false
 }
 
 func (l *Lexer) readIdentifier() string {
