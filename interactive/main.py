@@ -16,7 +16,7 @@ def handle_run():
 
 st.header("INTERPRETER")
 
-example_dir = os.path.join('../example')
+example_dir = os.path.join('./example')
 example_file = st.selectbox('Select Example', ['none'] + os.listdir(example_dir))
 
 example_code = "let x = 5;\nx = 11;\nputs(x * x);"
