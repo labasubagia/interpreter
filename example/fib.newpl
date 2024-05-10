@@ -1,3 +1,5 @@
+# max only 20 because recursive is resource heavy
+
 let fib_max_twenty = fn(n) {
     if (n > 20) {
         return null
