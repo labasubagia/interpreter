@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os/user"
 
 	"github.com/labasubagia/interpreter/evaluator"
 	"github.com/labasubagia/interpreter/lexer"
@@ -16,12 +15,7 @@ const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("Hello %s! This is the NEW Programming Language!\n", user.Username)
+	fmt.Printf("This is the NEW Programming Language!\n")
 	fmt.Println("Feel free to type in commands")
 
 	scanner := bufio.NewScanner(in)
