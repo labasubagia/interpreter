@@ -2,12 +2,15 @@ import streamlit as st
 import subprocess
 import os
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 if 'result' not in st.session_state:
     st.session_state['result'] = ''
 
 
 def handle_run():
-    args = ("./interpreter", "string", code)
+    bin_path = os.path.join(dir_path, "./interpreter")
+    args = (bin_path, "string", code)
     popen = subprocess.Popen(args, stdout=subprocess.PIPE)
     popen.wait()
     if popen.stdout:
@@ -16,7 +19,7 @@ def handle_run():
 
 st.header("INTERPRETER")
 
-example_dir = os.path.join('./example')
+example_dir = os.path.join(dir_path,'./example')
 example_file = st.selectbox('Select Example', ['none'] + os.listdir(example_dir))
 
 example_code = "let x = 5;\nx = 11;\nputs(x * x);"
