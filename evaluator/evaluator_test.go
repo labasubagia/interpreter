@@ -329,6 +329,17 @@ func TestAssignExpressions(t *testing.T) {
 			`
 				let x = 12;
 				let f = fn() {
+					let x = 50
+				}
+				f()
+				x
+			`,
+			12,
+		},
+		{
+			`
+				let x = 12;
+				let f = fn() {
 					x = 50
 					let fa = fn() {
 						x = 55
@@ -339,6 +350,21 @@ func TestAssignExpressions(t *testing.T) {
 				x
 			`,
 			55,
+		},
+		{
+			`
+				let x = 12;
+				let f = fn() {
+					let x = 50
+					let fa = fn() {
+						let x = 55
+					}
+					fa()
+				}
+				f()
+				x
+			`,
+			12,
 		},
 
 		{"let arr = [1,2,3,4]; arr[1+1] = 12; arr[2]", 12},
@@ -356,6 +382,20 @@ func TestAssignExpressions(t *testing.T) {
 				arr[2];
 			`,
 			44,
+		},
+		{
+			`
+				let arr = [4, 2, 1, 5];
+
+				let fa = fn() {
+					let arr = [1,2,3]
+					arr[2] = 44;
+				}
+
+				fa();
+				arr[2];
+			`,
+			1,
 		},
 		{
 			`
@@ -398,6 +438,21 @@ func TestAssignExpressions(t *testing.T) {
 				hash["a"];
 			`,
 			99,
+		},
+		{
+			`
+				let hash = {"a": 10};
+
+				fn() {
+					let hash = {}
+					fn(){
+						hash["a"] = 99;
+					}()
+				}()
+
+				hash["a"];
+			`,
+			10,
 		},
 	}
 	for _, tt := range tests {
@@ -493,6 +548,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("hello world")`, 11},
 		{`len([])`, 0},
 		{`len([1, 2, 3])`, 3},
+		{`len({"a": 1, "b": 2, "c": false})`, 3},
 		{`len(1)`, "argument to `len` not supported, got INTEGER"},
 		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
 
