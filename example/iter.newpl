@@ -4,7 +4,7 @@ let map = fn(arr, f) {
             return accumulated;
         }
         return iter(
-            rest(arr), 
+            rest(arr),
             push(accumulated, f(first(arr)))
         );
     };

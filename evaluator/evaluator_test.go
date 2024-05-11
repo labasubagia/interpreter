@@ -347,7 +347,7 @@ func TestAssignExpressions(t *testing.T) {
 		{
 			`
 				let arr = [4, 2, 1, 5];
-				
+
 				let fa = fn() {
 					arr[2] = 44;
 				}
@@ -360,7 +360,7 @@ func TestAssignExpressions(t *testing.T) {
 		{
 			`
 				let arr = [4, 2, 1, 5];
-				
+
 				fn() {
 					arr[2] = 44;
 					fn(){
@@ -375,7 +375,7 @@ func TestAssignExpressions(t *testing.T) {
 		{
 			`
 				let hash = {};
-				
+
 				fn() {
 					hash["a"] = 66;
 				}()
@@ -387,7 +387,7 @@ func TestAssignExpressions(t *testing.T) {
 		{
 			`
 				let hash = {};
-				
+
 				fn() {
 					hash["a"] = 66;
 					fn(){

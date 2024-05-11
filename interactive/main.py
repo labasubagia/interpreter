@@ -1,6 +1,6 @@
 import streamlit as st
 import subprocess
-import urllib.request 
+import urllib.request
 import os
 
 st.header("INTERPRETER")
@@ -13,7 +13,7 @@ if 'result' not in st.session_state:
 
 def download_bin():
     if os.path.exists(bin_path):
-        return    
+        return
     bin_url = "https://github.com/labasubagia/interpreter/releases/download/latest/interpreter"
     with st.spinner(text="Download binary file"):
         urllib.request.urlretrieve(bin_url, bin_path)

@@ -1,0 +1,31 @@
+default_stages:
+  - commit
+  - push
+fail_fast: true
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-merge-conflict
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-vet
+      - id: go-imports
+      - id: go-unit-tests
+      - id: go-build
+      - id: go-mod-tidy
+  - repo: local
+    hooks:
+      - id: go-build-interactive
+        name: go-build-interactive
+        entry: sh -c 'make build_static_for_interactive'
+        language: system
+        pass_filenames: false
+        stages: [push]
