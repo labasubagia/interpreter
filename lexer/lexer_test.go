@@ -8,8 +8,8 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `
-		# this is comment 1
-		# this is comment 2
+		# comment at the start 1
+		# comment at the start 2
 
 		let five = 5;
 		let ten = 10;
@@ -18,7 +18,7 @@ func TestNextToken(t *testing.T) {
 			x + y;
 		};
 
-		# this is comment 3
+		# comment in the middle 1
 
 		let result = add(five, ten);
 
@@ -30,6 +30,8 @@ func TestNextToken(t *testing.T) {
 		} else {
 			return false
 		}
+
+		# comment in the middle 2
 
 		10 == 10;
 		9 != 10;
@@ -43,6 +45,9 @@ func TestNextToken(t *testing.T) {
 
 		10 <= 12;
 		5 >= 3;
+
+		# comment at the end 1
+		# comment at the end 2
 	`
 
 	tests := []struct {

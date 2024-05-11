@@ -155,7 +155,7 @@ func (l *Lexer) skipUnused() {
 
 func (l *Lexer) isComment() bool {
 	if l.ch == '#' {
-		for l.ch != '\n' || l.ch == 0 {
+		for !(l.ch == '\n' || l.ch == 0) {
 			l.readChar()
 		}
 		l.readChar()
