@@ -1,6 +1,5 @@
 default_stages:
   - commit
-  - push
 fail_fast: true
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -35,4 +34,3 @@ repos:
           '
         language: system
         pass_filenames: false
-        stages: [push]
