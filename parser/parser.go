@@ -12,6 +12,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	ASSIGN       // =
 	EQUALS       // ==
 	LESS_GREATER // > or <
 	SUM          // +
@@ -39,6 +40,7 @@ var precedences = map[token.TokenType]int{
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
 	token.LBRACKET: INDEX,
+	token.ASSIGN:   ASSIGN,
 }
 
 type Parser struct {
@@ -86,6 +88,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GTE, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.ASSIGN, p.parseAssignExpression)
 
 	return p
 }
@@ -121,10 +124,6 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 func (p *Parser) parseStatement() ast.Statement {
 	// defer untrace(trace("parseStatement"))
 
-	if p.curToken.Type == token.IDENT && p.peekToken.Type == token.ASSIGN {
-		return p.parseAssignStatement()
-	}
-
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
@@ -135,25 +134,12 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseAssignStatement() ast.Statement {
-
-	stmt := &ast.AssignStatement{Token: token.Token{Type: token.ASSIGN, Literal: "="}}
-	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
-	// find token.ASSIGN
-	if !p.expectPeek(token.ASSIGN) {
-		return nil
-	}
-
+func (p *Parser) parseAssignExpression(left ast.Expression) ast.Expression {
+	exp := &ast.AssignExpression{Token: p.curToken}
+	exp.Left = left
 	p.nextToken()
-
-	stmt.Value = p.parseExpression(LOWEST)
-
-	for p.peekTokenIs(token.SEMICOLON) {
-		p.nextToken()
-	}
-
-	return stmt
+	exp.Value = p.parseExpression(LOWEST)
+	return exp
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {

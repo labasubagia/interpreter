@@ -125,16 +125,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
-	case *ast.AssignStatement:
-		val := Eval(node.Value, env)
-		if isError(val) {
-			return val
-		}
-		_, ok := env.Assign(node.Name.Value, val)
-		if !ok {
-			return newError("identifier not found: %s", node.Name.String())
-		}
-
+	case *ast.AssignExpression:
+		return evalAssignExpression(node, env)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 	case *ast.PrefixExpression:
@@ -478,6 +470,95 @@ func evalHashLiteral(node *ast.HashLiteral, env *object.Environment) object.Obje
 	}
 
 	return &object.Hash{Pairs: pairs}
+}
+
+func evalAssignExpression(node *ast.AssignExpression, env *object.Environment) object.Object {
+	switch exp := node.Left.(type) {
+	case *ast.Identifier:
+		return evalIdentifierAssignExpression(exp, node.Value, env)
+	case *ast.IndexExpression:
+		return evalIndexAssignExpression(exp, node.Value, env)
+	default:
+		return newError("invalid identifier when assign value: %s", node.Left.String())
+	}
+}
+
+func evalIdentifierAssignExpression(ident *ast.Identifier, value ast.Expression, env *object.Environment) object.Object {
+	val := Eval(value, env)
+	if isError(val) {
+		return val
+	}
+
+	_, ok := env.Assign(ident.Value, val)
+	if !ok {
+		return newError("identifier not found: %s", ident.Value)
+	}
+	return val
+}
+
+func evalIndexAssignExpression(exp *ast.IndexExpression, value ast.Expression, env *object.Environment) object.Object {
+	ident, ok := exp.Left.(*ast.Identifier)
+	if !ok {
+		return newError("invalid identifier using index")
+	}
+
+	cur, ok := env.Get(ident.Value)
+	if !ok {
+		return newError("identifier not found: %s", ident.Value)
+	}
+
+	index := Eval(exp.Index, env)
+	if isError(index) {
+		return index
+	}
+
+	val := Eval(value, env)
+	if isError(val) {
+		return val
+	}
+
+	switch {
+	case cur.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
+		return evalArrayIndexAssignExpression(ident, cur, index, val, env)
+	case cur.Type() == object.HASH_OBJ:
+		return evalHashIndexAssignExpression(ident, cur, index, val, env)
+	default:
+		return newError("index not supported: %s[%s]", cur.Type(), index.Type())
+	}
+}
+
+func evalArrayIndexAssignExpression(ident *ast.Identifier, arr, index, val object.Object, env *object.Environment) object.Object {
+	arrayObject := arr.(*object.Array)
+	indexObject := index.(*object.Integer)
+
+	n := len(arrayObject.Elements)
+	if n == 0 {
+		return newError("array is empty. cannot set at any index")
+	}
+	i := int(indexObject.Value)
+	if i < 0 || i >= n {
+		return newError("valid index range is 0 until %d. got=%d", n-1, i)
+	}
+
+	arrayObject.Elements[i] = val
+	env.Assign(ident.Value, arrayObject)
+	return val
+}
+
+func evalHashIndexAssignExpression(ident *ast.Identifier, hash, index, val object.Object, env *object.Environment) object.Object {
+	hashObject := hash.(*object.Hash)
+
+	key, ok := index.(object.Hashable)
+	if !ok {
+		return newError("unusable as hash key: %s", index.Type())
+	}
+
+	hashObject.Pairs[key.HashKey()] = object.HashPair{
+		Key:   index,
+		Value: val,
+	}
+	env.Assign(ident.Value, hashObject)
+	return val
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

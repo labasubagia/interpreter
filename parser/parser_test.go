@@ -684,27 +684,43 @@ func TestParsingEmptyHashLiteral(t *testing.T) {
 	}
 }
 
-func TestAssignStatement(t *testing.T) {
+func TestAssignExpressions(t *testing.T) {
 
-	input := "x = 5;"
-
-	l := lexer.New(input)
-	p := New(l)
-	program := p.ParseProgram()
-	checkParserErrors(t, p)
-
-	stmt, ok := program.Statements[0].(*ast.AssignStatement)
-	if !ok {
-		t.Fatalf("exp is not ast.AssignStatement. got=%T", program.Statements[0])
+	tests := []struct {
+		input       string
+		expectLeft  string
+		expectValue string
+	}{
+		{"x = 5;", "x", "5"},
+		{"x[2 + 1] = 5 * 3;", "(x[(2 + 1)])", "(5 * 3)"},
 	}
 
-	if stmt.Name.String() != "x" {
-		t.Errorf("stmt.Name is not x. got=%q", stmt.Name.String())
+	for _, tt := range tests {
+
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.AssignStatement. got=%T", program.Statements[0])
+		}
+
+		exp, ok := stmt.Expression.(*ast.AssignExpression)
+		if !ok {
+			t.Fatalf("stmt.Expression is not ast.AssignExpression. got=%T", stmt.Expression)
+		}
+
+		if exp.Left.String() != tt.expectLeft {
+			t.Errorf("exp.Left is not %q. got=%q", tt.expectLeft, stmt.String())
+		}
+
+		if exp.Value.String() != tt.expectValue {
+			t.Errorf("exp.Value is not %q. got=%q", tt.expectValue, exp.Value.String())
+		}
 	}
 
-	if stmt.Value.String() != "5" {
-		t.Errorf("stmt.Value is not x. got=%q", stmt.Value.String())
-	}
 }
 
 func TestParsingHashLiteralsWithExpressions(t *testing.T) {

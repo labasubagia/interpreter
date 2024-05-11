@@ -67,27 +67,25 @@ func (l *LetStatement) String() string {
 	return out.String()
 }
 
-type AssignStatement struct {
+type AssignExpression struct {
 	Token token.Token // the token.ASSIGN token
-	Name  *Identifier
+	Left  Expression
 	Value Expression
 }
 
-func (l *AssignStatement) statementNode() {
+func (ae *AssignExpression) expressionNode() {
 
 }
 
-func (l *AssignStatement) TokenLiteral() string {
-	return l.Token.Literal
+func (ae *AssignExpression) TokenLiteral() string {
+	return ae.Token.Literal
 }
 
-func (l *AssignStatement) String() string {
+func (ae *AssignExpression) String() string {
 	var out bytes.Buffer
-	out.WriteString(l.Name.String())
+	out.WriteString(ae.Left.String())
 	out.WriteString(" = ")
-	if l.Value != nil {
-		out.WriteString(l.Value.String())
-	}
+	out.WriteString(ae.Value.String())
 	out.WriteString(";")
 	return out.String()
 }

@@ -208,9 +208,58 @@ func TestErrorHandling(t *testing.T) {
 			"unusable as hash key: FUNCTION",
 		},
 
+		// assign
+		{
+			"12 = 12;",
+			"invalid identifier when assign value: 12",
+		},
+		{
+			"[1,2][0] = 12;",
+			"invalid identifier using index",
+		},
+		{
+			`{"a": 12, "b": 3}["a"] = 8;`,
+			"invalid identifier using index",
+		},
 		{
 			"foobar = 12;",
 			"identifier not found: foobar",
+		},
+		{
+			"foo = bar;",
+			"identifier not found: bar",
+		},
+		{
+			"arr[0] = 12",
+			"identifier not found: arr",
+		},
+		{
+			"let arr = [1,2]; arr[x] = 12",
+			"identifier not found: x",
+		},
+		{
+			"let arr = [1,2]; arr[0] = y",
+			"identifier not found: y",
+		},
+		{
+			`let arr = [1,2]; arr[false] = 12`,
+			"index not supported: ARRAY[BOOLEAN]",
+		},
+		{
+			`let arr = [1,2]; arr["invalid"] = 12`,
+			"index not supported: ARRAY[STRING]",
+		},
+		{
+			`let arr = []; arr[0] = 12`,
+			"array is empty. cannot set at any index",
+		},
+		{
+			`let arr = [1,2]; arr[4] = 12`,
+			"valid index range is 0 until 1. got=4",
+		},
+		{
+			`let hash = {"a": 12}; hash[[1,2]] = 12;`,
+			"unusable as hash key: ARRAY",
 		},
 	}
 
@@ -244,11 +293,12 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
-func TestAssignStatements(t *testing.T) {
+func TestAssignExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected int64
 	}{
+		{"let a = 5; a = 12;", 12},
 		{"let a = 5; a = 12; a;", 12},
 		{"let a = 5; a = 12; a = 13;  a;", 13},
 		{"let a = 5; a = 12; a = 5 * 5 + 5;  a;", 30},
@@ -277,6 +327,65 @@ func TestAssignStatements(t *testing.T) {
 				x
 			`,
 			55,
+		},
+
+		{"let arr = [1,2,3,4]; arr[1+1] = 12; arr[2]", 12},
+		{`let hash = {"a": 12, "b": 4}; hash["a"] = 40; hash["a"];`, 40},
+		{`let hash = {}; hash["z"] = 22; hash["z"];`, 22},
+		{
+			`
+				let arr = [4, 2, 1, 5];
+				
+				let fa = fn() {
+					arr[2] = 44;
+				}
+
+				fa();
+				arr[2];
+			`,
+			44,
+		},
+		{
+			`
+				let arr = [4, 2, 1, 5];
+				
+				fn() {
+					arr[2] = 44;
+					fn(){
+						arr[2] = 66;
+					}()
+				}()
+
+				arr[2];
+			`,
+			66,
+		},
+		{
+			`
+				let hash = {};
+				
+				fn() {
+					hash["a"] = 66;
+				}()
+
+				hash["a"];
+			`,
+			66,
+		},
+		{
+			`
+				let hash = {};
+				
+				fn() {
+					hash["a"] = 66;
+					fn(){
+						hash["a"] = 99;
+					}()
+				}()
+
+				hash["a"];
+			`,
+			99,
 		},
 	}
 	for _, tt := range tests {
