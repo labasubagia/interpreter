@@ -70,6 +70,18 @@ func TestEvalBooleanObject(t *testing.T) {
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},
 		{"(1 > 2) == false", true},
+
+		{"null == null", true},
+		{"null != null", false},
+		{"let x = null; x == null", true},
+		{"let x = 12; x != null", true},
+		{"let x = false; x != null", true},
+		{"let x = true; x != null", true},
+		{"let x = 0; x != null", true},
+		{"let arr = [1,2,3]; arr[20] == null", true},
+		{"let arr = [1,2,3]; arr[2] != null", true},
+		{`let hash = {}; hash["a"] == null`, true},
+		{`let hash = {"a": 12}; hash["a"] == null`, false},
 	}
 
 	for _, tt := range tests {

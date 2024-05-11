@@ -150,6 +150,22 @@ func (i *Identifier) String() string {
 	return i.Value
 }
 
+type Null struct {
+	Token token.Token // the token.NULL token
+}
+
+func (n *Null) expressionNode() {
+
+}
+
+func (n *Null) TokenLiteral() string {
+	return n.Token.Literal
+}
+
+func (n *Null) String() string {
+	return "null"
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64

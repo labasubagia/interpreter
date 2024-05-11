@@ -586,6 +586,20 @@ func TestStringExpression(t *testing.T) {
 	}
 }
 
+func TestNullExpression(t *testing.T) {
+	input := `null`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	if _, ok := stmt.Expression.(*ast.Null); !ok {
+		t.Fatalf("stmt.Expression not ast.Null. got=%T", stmt.Expression)
+	}
+}
+
 func TestParsingArrayLiterals(t *testing.T) {
 	input := "[1, 2 * 2, 3 + 3]"
 
