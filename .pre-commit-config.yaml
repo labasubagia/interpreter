@@ -32,5 +32,5 @@ repos:
             && mv interpreter interactive \
             && git add interactive/interpreter \
           '
-        language: system
+        language: golang
         pass_filenames: false
