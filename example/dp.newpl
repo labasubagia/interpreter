@@ -1,0 +1,20 @@
+let fib = fn(n, cache) {
+    if (n <= 0) {
+        return 0;
+    }
+    if (n <= 2) {
+        return 1;
+    }
+    if (cache[n]) {
+        return cache[n];
+    }
+
+    let res = fib(n-1, cache) + fib(n-2, cache);
+    cache[n] = res;
+    return res;
+}
+
+let cache = {}
+let x = fib(100, cache);
+
+puts(x);
