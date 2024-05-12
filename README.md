@@ -61,7 +61,7 @@ let arr = [1, 2, 3, "abc", false];
 let hash = {"a":  12, 5: "a", false: 12};
 puts(x, y, arr[1], hash[false]);
 ```
-> **Limitation**: `float` not supported
+> **Limitation**: `float` currently not supported
 
 ### Function
 ```
@@ -99,7 +99,18 @@ if (2 > 3) {
 
 ### Loop
 
-Loop possible using recursion.
+```
+let arr = [1,2,3,4,5];
+
+let i = 0
+while (i < len(arr)) {
+    puts(arr[i] * arr[i]);
+    i = i + 1;
+}
+
+```
+
+Loop also possible using recursion.
 
 ```
 let map = fn(arr, f) {
@@ -143,7 +154,7 @@ puts("squared", squared);
 
 ```
 
-> **Limitation**: `for`, `while` currently not supported.
+> **Limitation**: `for-loop` currently not supported.
 
 
 ### Examples
