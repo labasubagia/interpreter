@@ -378,13 +378,13 @@ func evalInfixIntegerExpression(operator string, left, right object.Object) obje
 	rightVal := right.(*object.Integer).Value
 
 	switch operator {
-	case "+":
+	case "+", "+=":
 		return &object.Integer{Value: leftVal + rightVal}
-	case "-":
+	case "-", "-=":
 		return &object.Integer{Value: leftVal - rightVal}
-	case "*":
+	case "*", "*=":
 		return &object.Integer{Value: leftVal * rightVal}
-	case "/":
+	case "/", "/=":
 		return &object.Integer{Value: leftVal / rightVal}
 
 	case "==":
@@ -505,7 +505,7 @@ func evalIdentifierAssignExpression(ident *ast.Identifier, operator string, valu
 		if !(cur.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
 			return newError("unsupported assign %s %s %s", cur.Type(), operator, val.Type())
 		}
-		val = evalIntegerAssign(operator, cur, val)
+		val = evalInfixExpression(operator, cur, val)
 	}
 
 	env.Assign(ident.Value, val)
@@ -567,7 +567,7 @@ func evalArrayIndexAssignExpression(
 		if !(cur.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
 			return newError("unsupported assign %s[%s] -> %s %s %s", arr.Type(), index.Type(), cur.Type(), operator, val.Type())
 		}
-		val = evalIntegerAssign(operator, cur, val)
+		val = evalInfixExpression(operator, cur, val)
 	}
 
 	arrayObject.Elements[i] = val
@@ -597,7 +597,7 @@ func evalHashIndexAssignExpression(
 		if !(cur.Value.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
 			return newError("unsupported assign %s[%s] -> %s %s %s", hashObject.Type(), cur.Key.Type(), cur.Value.Type(), operator, val.Type())
 		}
-		val = evalIntegerAssign(operator, cur.Value, val)
+		val = evalInfixExpression(operator, cur.Value, val)
 	}
 
 	hashObject.Pairs[key] = object.HashPair{
@@ -606,24 +606,6 @@ func evalHashIndexAssignExpression(
 	}
 	env.Assign(ident.Value, hashObject)
 	return val
-}
-
-func evalIntegerAssign(operator string, cur, val object.Object) object.Object {
-	old := cur.(*object.Integer).Value
-	new := val.(*object.Integer).Value
-	switch operator {
-	case "+=":
-		return &object.Integer{Value: old + new}
-	case "-=":
-		return &object.Integer{Value: old - new}
-	case "*=":
-		return &object.Integer{Value: old * new}
-	case "/=":
-		return &object.Integer{Value: old / new}
-	case "=":
-		return val
-	}
-	return newError("unsupported operator assign: %q", operator)
 }
 
 func isCompoundAssignmentOperator(operator string) bool {
