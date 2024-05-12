@@ -1,0 +1,51 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "run file",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "file",
+                "example/loop.newpl"
+            ]
+        },
+        {
+            "name": "run string",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "string",
+                "let x = 12; puts(x);"
+            ]
+        },
+        {
+            "name": "run REPL",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "repl"
+            ]
+        },
+        {
+            "name": "run playground",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "streamlit",
+            "env": {
+                "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION": "python"
+            },
+            "args": [
+                "run",
+                "./interactive/main.py"
+            ]
+        }
+    ]
+}
