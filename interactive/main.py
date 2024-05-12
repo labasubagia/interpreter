@@ -32,8 +32,8 @@ def handle_run():
 
 download_bin()
 
-example_dir = os.path.join(dir_path,'../example')
-example_file = st.selectbox('Select Example', ['none'] + os.listdir(example_dir))
+example_dir = os.path.join(dir_path, '../example')
+example_file = st.selectbox('Select Example', ['none'] + sorted(os.listdir(example_dir)))
 
 example_code = "let x = 5;\nx = 11;\nputs(x * x);"
 if example_file and example_file != 'none':
