@@ -273,6 +273,36 @@ func TestErrorHandling(t *testing.T) {
 			`let hash = {"a": 12}; hash[[1,2]] = 12;`,
 			"unusable as hash key: ARRAY",
 		},
+
+		{
+			`let x = 12; x += "abc";`,
+			"unsupported assign INTEGER += STRING",
+		},
+		{
+			`
+				let arr = [false, 12];
+				arr[1] += "eat";
+				arr[1];
+			`,
+			"unsupported assign ARRAY[INTEGER] -> INTEGER += STRING",
+		},
+		{
+			`
+				let hash = {};
+				hash["a"] += 12;
+				hash["a"];
+			`,
+			"cannot assign key not exist: hash[a] += 12",
+		},
+
+		{
+			`
+				let hash = {"a": 12};
+				hash["a"] += "eat";
+				hash["a"];
+			`,
+			"unsupported assign HASH[STRING] -> INTEGER += STRING",
+		},
 	}
 
 	for _, tt := range tests {
@@ -453,6 +483,43 @@ func TestAssignExpressions(t *testing.T) {
 				hash["a"];
 			`,
 			10,
+		},
+
+		{"let x = 5; x += 10 * 2; x", 25},
+		{"let x = 5; x -= 10; x", -5},
+		{"let x = 5; x *= 10; x", 50},
+		{"let x = 20; x /= 10; x", 2},
+		{"let x = 20; x /= 10 / 2; x", 4},
+
+		{
+			`
+			let arr = [1,5,3,4];
+			arr[2] += 20
+			`,
+			23,
+		},
+		{
+			`
+			let arr = [1,5,3,4];
+			arr[2] -= 20
+			`,
+			-17,
+		},
+		{
+			`
+				let hash = {"a": 2};
+				hash["a"] *= 12;
+				hash["a"];
+			`,
+			24,
+		},
+		{
+			`
+				let hash = {"a": 2};
+				hash["a"] /= 2;
+				hash["a"];
+			`,
+			1,
 		},
 	}
 	for _, tt := range tests {

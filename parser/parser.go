@@ -28,19 +28,23 @@ type (
 )
 
 var precedences = map[token.TokenType]int{
-	token.EQ:       EQUALS,
-	token.NOT_EQ:   EQUALS,
-	token.LT:       LESS_GREATER,
-	token.LTE:      LESS_GREATER,
-	token.GT:       LESS_GREATER,
-	token.GTE:      LESS_GREATER,
-	token.PLUS:     SUM,
-	token.MINUS:    SUM,
-	token.SLASH:    PRODUCT,
-	token.ASTERISK: PRODUCT,
-	token.LPAREN:   CALL,
-	token.LBRACKET: INDEX,
-	token.ASSIGN:   ASSIGN,
+	token.EQ:              EQUALS,
+	token.NOT_EQ:          EQUALS,
+	token.LT:              LESS_GREATER,
+	token.LTE:             LESS_GREATER,
+	token.GT:              LESS_GREATER,
+	token.GTE:             LESS_GREATER,
+	token.PLUS:            SUM,
+	token.MINUS:           SUM,
+	token.SLASH:           PRODUCT,
+	token.ASTERISK:        PRODUCT,
+	token.LPAREN:          CALL,
+	token.LBRACKET:        INDEX,
+	token.ASSIGN:          ASSIGN,
+	token.PLUS_ASSIGN:     ASSIGN,
+	token.MINUS_ASSIGN:    ASSIGN,
+	token.ASTERISK_ASSIGN: ASSIGN,
+	token.SLASH_ASSIGN:    ASSIGN,
 }
 
 type Parser struct {
@@ -90,6 +94,10 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 	p.registerInfix(token.ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.PLUS_ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.MINUS_ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.ASTERISK_ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.SLASH_ASSIGN, p.parseAssignExpression)
 
 	return p
 }
@@ -164,7 +172,7 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 }
 
 func (p *Parser) parseAssignExpression(left ast.Expression) ast.Expression {
-	exp := &ast.AssignExpression{Token: p.curToken}
+	exp := &ast.AssignExpression{Token: p.curToken, Operator: p.curToken.Literal}
 	exp.Left = left
 	p.nextToken()
 	exp.Value = p.parseExpression(LOWEST)

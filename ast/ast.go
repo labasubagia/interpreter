@@ -68,9 +68,10 @@ func (l *LetStatement) String() string {
 }
 
 type AssignExpression struct {
-	Token token.Token // the token.ASSIGN token
-	Left  Expression
-	Value Expression
+	Token    token.Token // the token.ASSIGN token
+	Left     Expression
+	Operator string
+	Value    Expression
 }
 
 func (ae *AssignExpression) expressionNode() {
@@ -84,7 +85,7 @@ func (ae *AssignExpression) TokenLiteral() string {
 func (ae *AssignExpression) String() string {
 	var out bytes.Buffer
 	out.WriteString(ae.Left.String())
-	out.WriteString(" = ")
+	out.WriteString(" " + ae.Operator + " ")
 	out.WriteString(ae.Value.String())
 	out.WriteString(";")
 	return out.String()

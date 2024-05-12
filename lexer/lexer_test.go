@@ -46,6 +46,11 @@ func TestNextToken(t *testing.T) {
 		10 <= 12;
 		5 >= 3;
 
+		a += 1;
+		b -= 2;
+		c *= 3;
+		d /= 4;
+
 		# comment at the end 1
 		# comment at the end 2
 	`
@@ -162,6 +167,26 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "5"},
 		{token.GTE, ">="},
 		{token.INT, "3"},
+		{token.SEMICOLON, ";"},
+
+		{token.IDENT, "a"},
+		{token.PLUS_ASSIGN, "+="},
+		{token.INT, "1"},
+		{token.SEMICOLON, ";"},
+
+		{token.IDENT, "b"},
+		{token.MINUS_ASSIGN, "-="},
+		{token.INT, "2"},
+		{token.SEMICOLON, ";"},
+
+		{token.IDENT, "c"},
+		{token.ASTERISK_ASSIGN, "*="},
+		{token.INT, "3"},
+		{token.SEMICOLON, ";"},
+
+		{token.IDENT, "d"},
+		{token.SLASH_ASSIGN, "/="},
+		{token.INT, "4"},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},

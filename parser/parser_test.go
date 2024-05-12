@@ -701,12 +701,17 @@ func TestParsingEmptyHashLiteral(t *testing.T) {
 func TestAssignExpressions(t *testing.T) {
 
 	tests := []struct {
-		input       string
-		expectLeft  string
-		expectValue string
+		input            string
+		expectLeft       string
+		expectedOperator string
+		expectValue      string
 	}{
-		{"x = 5;", "x", "5"},
-		{"x[2 + 1] = 5 * 3;", "(x[(2 + 1)])", "(5 * 3)"},
+		{"a += 12;", "a", "+=", "12"},
+		{"b -= 4;", "b", "-=", "4"},
+		{"c = 5;", "c", "=", "5"},
+		{"d *= 4;", "d", "*=", "4"},
+		{"e /= 2;", "e", "/=", "2"},
+		{"x[2 + 1] = 5 * 3;", "(x[(2 + 1)])", "=", "(5 * 3)"},
 	}
 
 	for _, tt := range tests {
@@ -728,6 +733,10 @@ func TestAssignExpressions(t *testing.T) {
 
 		if exp.Left.String() != tt.expectLeft {
 			t.Errorf("exp.Left is not %q. got=%q", tt.expectLeft, stmt.String())
+		}
+
+		if exp.Operator != tt.expectedOperator {
+			t.Errorf("exp.Operator is not %q. got=%q", tt.expectedOperator, exp.Operator)
 		}
 
 		if exp.Value.String() != tt.expectValue {

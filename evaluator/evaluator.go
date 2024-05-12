@@ -482,28 +482,37 @@ func evalHashLiteral(node *ast.HashLiteral, env *object.Environment) object.Obje
 func evalAssignExpression(node *ast.AssignExpression, env *object.Environment) object.Object {
 	switch exp := node.Left.(type) {
 	case *ast.Identifier:
-		return evalIdentifierAssignExpression(exp, node.Value, env)
+		return evalIdentifierAssignExpression(exp, node.Operator, node.Value, env)
 	case *ast.IndexExpression:
-		return evalIndexAssignExpression(exp, node.Value, env)
+		return evalIndexAssignExpression(exp, node.Operator, node.Value, env)
 	default:
 		return newError("invalid identifier when assign value: %s", node.Left.String())
 	}
 }
 
-func evalIdentifierAssignExpression(ident *ast.Identifier, value ast.Expression, env *object.Environment) object.Object {
+func evalIdentifierAssignExpression(ident *ast.Identifier, operator string, value ast.Expression, env *object.Environment) object.Object {
 	val := Eval(value, env)
 	if isError(val) {
 		return val
 	}
 
-	_, ok := env.Assign(ident.Value, val)
+	cur, ok := env.Get(ident.Value)
 	if !ok {
 		return newError("identifier not found: %s", ident.Value)
 	}
+
+	if isCompoundAssignmentOperator(operator) {
+		if !(cur.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
+			return newError("unsupported assign %s %s %s", cur.Type(), operator, val.Type())
+		}
+		val = evalIntegerAssign(operator, cur, val)
+	}
+
+	env.Assign(ident.Value, val)
 	return val
 }
 
-func evalIndexAssignExpression(exp *ast.IndexExpression, value ast.Expression, env *object.Environment) object.Object {
+func evalIndexAssignExpression(exp *ast.IndexExpression, operator string, value ast.Expression, env *object.Environment) object.Object {
 	ident, ok := exp.Left.(*ast.Identifier)
 	if !ok {
 		return newError("invalid identifier using index")
@@ -526,15 +535,21 @@ func evalIndexAssignExpression(exp *ast.IndexExpression, value ast.Expression, e
 
 	switch {
 	case cur.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
-		return evalArrayIndexAssignExpression(ident, cur, index, val, env)
+		return evalArrayIndexAssignExpression(ident, cur, index, operator, val, env)
 	case cur.Type() == object.HASH_OBJ:
-		return evalHashIndexAssignExpression(ident, cur, index, val, env)
+		return evalHashIndexAssignExpression(ident, cur, index, operator, val, env)
 	default:
 		return newError("index not supported: %s[%s]", cur.Type(), index.Type())
 	}
 }
 
-func evalArrayIndexAssignExpression(ident *ast.Identifier, arr, index, val object.Object, env *object.Environment) object.Object {
+func evalArrayIndexAssignExpression(
+	ident *ast.Identifier,
+	arr, index object.Object,
+	operator string,
+	val object.Object,
+	env *object.Environment,
+) object.Object {
 	arrayObject := arr.(*object.Array)
 	indexObject := index.(*object.Integer)
 
@@ -547,25 +562,76 @@ func evalArrayIndexAssignExpression(ident *ast.Identifier, arr, index, val objec
 		return newError("valid index range is 0 until %d. got=%d", n-1, i)
 	}
 
+	cur := arrayObject.Elements[i]
+	if isCompoundAssignmentOperator(operator) {
+		if !(cur.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
+			return newError("unsupported assign %s[%s] -> %s %s %s", arr.Type(), index.Type(), cur.Type(), operator, val.Type())
+		}
+		val = evalIntegerAssign(operator, cur, val)
+	}
+
 	arrayObject.Elements[i] = val
 	env.Assign(ident.Value, arrayObject)
 	return val
 }
 
-func evalHashIndexAssignExpression(ident *ast.Identifier, hash, index, val object.Object, env *object.Environment) object.Object {
+func evalHashIndexAssignExpression(
+	ident *ast.Identifier,
+	hash, index object.Object,
+	operator string, val object.Object,
+	env *object.Environment,
+) object.Object {
 	hashObject := hash.(*object.Hash)
 
-	key, ok := index.(object.Hashable)
+	hashableKey, ok := index.(object.Hashable)
 	if !ok {
 		return newError("unusable as hash key: %s", index.Type())
 	}
+	key := hashableKey.HashKey()
 
-	hashObject.Pairs[key.HashKey()] = object.HashPair{
+	if isCompoundAssignmentOperator(operator) {
+		cur, ok := hashObject.Pairs[key]
+		if !ok {
+			return newError("cannot assign key not exist: %s[%s] %s %s", ident.Value, index.Inspect(), operator, val.Inspect())
+		}
+		if !(cur.Value.Type() == object.INTEGER_OBJ && val.Type() == object.INTEGER_OBJ) {
+			return newError("unsupported assign %s[%s] -> %s %s %s", hashObject.Type(), cur.Key.Type(), cur.Value.Type(), operator, val.Type())
+		}
+		val = evalIntegerAssign(operator, cur.Value, val)
+	}
+
+	hashObject.Pairs[key] = object.HashPair{
 		Key:   index,
 		Value: val,
 	}
 	env.Assign(ident.Value, hashObject)
 	return val
+}
+
+func evalIntegerAssign(operator string, cur, val object.Object) object.Object {
+	old := cur.(*object.Integer).Value
+	new := val.(*object.Integer).Value
+	switch operator {
+	case "+=":
+		return &object.Integer{Value: old + new}
+	case "-=":
+		return &object.Integer{Value: old - new}
+	case "*=":
+		return &object.Integer{Value: old * new}
+	case "/=":
+		return &object.Integer{Value: old / new}
+	case "=":
+		return val
+	}
+	return newError("unsupported operator assign: %q", operator)
+}
+
+func isCompoundAssignmentOperator(operator string) bool {
+	switch operator {
+	case "+=", "-=", "/=", "*=":
+		return true
+	}
+	return false
 }
 
 func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) object.Object {
