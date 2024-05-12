@@ -12,19 +12,21 @@ import (
 	"github.com/labasubagia/interpreter/repl"
 )
 
-func eval(input string) object.Object {
+func eval(input string) {
 	env := object.NewEnvironment()
 
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if len(p.Errors()) != 0 {
-		for _, e := range p.Errors() {
-			fmt.Println(e)
-			return nil
+		for i, e := range p.Errors() {
+			fmt.Printf("error parse-%d: %s\n", i, e)
 		}
 	}
-	return evaluator.Eval(program, env)
+	obj := evaluator.Eval(program, env)
+	if obj.Type() == object.ERROR_OBJ {
+		fmt.Println(obj.Inspect())
+	}
 }
 
 func main() {
