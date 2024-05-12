@@ -50,6 +50,7 @@ const (
 	FALSE    = "FALSE"
 	STRING   = "STRING"
 	NULL     = "NULL"
+	WHILE    = "WHILE"
 )
 
 var keywords = map[string]TokenType{
@@ -61,6 +62,7 @@ var keywords = map[string]TokenType{
 	"true":   TRUE,
 	"false":  FALSE,
 	"null":   NULL,
+	"while":  WHILE,
 }
 
 func LookupIdent(ident string) TokenType {

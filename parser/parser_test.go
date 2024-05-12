@@ -782,6 +782,46 @@ func TestParsingHashLiteralsWithExpressions(t *testing.T) {
 	}
 }
 
+func TestParsingWhileStatement(t *testing.T) {
+
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"while (true) {}",
+			"while(true){}",
+		},
+		{
+
+			`
+				while (2 == 2) {
+					let x = 12;
+					let y = 4;
+				}
+			`,
+			"while((2 == 2)){let x = 12;let y = 4;}",
+		},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		stmt, ok := program.Statements[0].(*ast.WhileStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.HashLiteral. got=%T", program.Statements[0])
+		}
+
+		if stmt.String() != tt.expected {
+			t.Fatalf("stmt is not '%q'. got='%q'", tt.expected, stmt.String())
+		}
+	}
+
+}
+
 func testInfixExpression(t *testing.T, exp ast.Expression, left any, operator string, right any) bool {
 	opExp, ok := exp.(*ast.InfixExpression)
 	if !ok {

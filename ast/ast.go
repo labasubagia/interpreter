@@ -441,3 +441,45 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+type WhileStatement struct {
+	Token     token.Token
+	Condition Expression
+	Body      *BlockStatement
+}
+
+func (ie *WhileStatement) statementNode() {
+
+}
+func (ie *WhileStatement) TokenLiteral() string {
+	return ie.Token.Literal
+}
+func (ie *WhileStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("while")
+	out.WriteString("(")
+	out.WriteString(ie.Condition.String())
+	out.WriteString(")")
+	out.WriteString("{")
+	out.WriteString(ie.Body.String())
+	out.WriteString("}")
+
+	return out.String()
+}
+
+type BreakStatement struct {
+	Token token.Token //  the `break` token
+}
+
+func (bs *BreakStatement) statementNode() {
+
+}
+
+func (bs *BreakStatement) TokenLiteral() string {
+	return bs.Token.Literal
+}
+
+func (ie *BreakStatement) String() string {
+	return "break"
+}

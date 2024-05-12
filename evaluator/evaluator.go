@@ -147,6 +147,28 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
+
+	case *ast.WhileStatement:
+		condition := Eval(node.Condition, env)
+		if isError(condition) {
+			return condition
+		}
+		for isTruthy(condition) {
+
+			stmt := evalBlockStatement(node.Body, env)
+			if stmt != nil {
+				switch stmt.Type() {
+				case object.RETURN_VALUE_OBJ, object.ERROR_OBJ:
+					return stmt
+				}
+			}
+
+			condition = Eval(node.Condition, env)
+			if isError(condition) {
+				return condition
+			}
+		}
+		return NULL
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
@@ -563,6 +585,21 @@ func evalHashIndexAssignExpression(ident *ast.Identifier, hash, index, val objec
 	}
 	env.Assign(ident.Value, hashObject)
 	return val
+}
+
+func evalLoopBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
+	var result object.Object
+	for _, statement := range block.Statements {
+		result = Eval(statement, env)
+
+		if result != nil {
+			rt := result.Type()
+			if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ {
+				return result
+			}
+		}
+	}
+	return result
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
