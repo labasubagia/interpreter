@@ -23,6 +23,8 @@ const (
 	ASTERISK_ASSIGN = "*="
 	SLASH           = "/"
 	SLASH_ASSIGN    = "/="
+	MODULO          = "%"
+	MODULO_ASSIGN   = "%="
 	BANG            = "!"
 
 	LT     = "<"

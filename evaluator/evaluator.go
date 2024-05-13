@@ -386,6 +386,8 @@ func evalInfixIntegerExpression(operator string, left, right object.Object) obje
 		return &object.Integer{Value: leftVal * rightVal}
 	case "/", "/=":
 		return &object.Integer{Value: leftVal / rightVal}
+	case "%", "%=":
+		return &object.Integer{Value: leftVal % rightVal}
 
 	case "==":
 		return nativeBoolToBooleanObject(leftVal == rightVal)
@@ -608,14 +610,6 @@ func evalHashIndexAssignExpression(
 	return val
 }
 
-func isCompoundAssignmentOperator(operator string) bool {
-	switch operator {
-	case "+=", "-=", "/=", "*=":
-		return true
-	}
-	return false
-}
-
 func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) object.Object {
 
 	condition := Eval(node.Condition, env)
@@ -654,6 +648,14 @@ func newError(format string, a ...any) *object.Error {
 func isError(obj object.Object) bool {
 	if obj != nil {
 		return obj.Type() == object.ERROR_OBJ
+	}
+	return false
+}
+
+func isCompoundAssignmentOperator(operator string) bool {
+	switch operator {
+	case "+=", "-=", "/=", "*=", "%=":
+		return true
 	}
 	return false
 }

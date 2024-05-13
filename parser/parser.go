@@ -38,6 +38,7 @@ var precedences = map[token.TokenType]int{
 	token.MINUS:           SUM,
 	token.SLASH:           PRODUCT,
 	token.ASTERISK:        PRODUCT,
+	token.MODULO:          PRODUCT,
 	token.LPAREN:          CALL,
 	token.LBRACKET:        INDEX,
 	token.ASSIGN:          ASSIGN,
@@ -45,6 +46,7 @@ var precedences = map[token.TokenType]int{
 	token.MINUS_ASSIGN:    ASSIGN,
 	token.ASTERISK_ASSIGN: ASSIGN,
 	token.SLASH_ASSIGN:    ASSIGN,
+	token.MODULO_ASSIGN:   ASSIGN,
 }
 
 type Parser struct {
@@ -85,6 +87,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(token.MODULO, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
@@ -98,6 +101,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.MINUS_ASSIGN, p.parseAssignExpression)
 	p.registerInfix(token.ASTERISK_ASSIGN, p.parseAssignExpression)
 	p.registerInfix(token.SLASH_ASSIGN, p.parseAssignExpression)
+	p.registerInfix(token.MODULO_ASSIGN, p.parseAssignExpression)
 
 	return p
 }

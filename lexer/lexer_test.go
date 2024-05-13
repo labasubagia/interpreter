@@ -51,6 +51,9 @@ func TestNextToken(t *testing.T) {
 		c *= 3;
 		d /= 4;
 
+		12 % 4;
+		f %= 4;
+
 		# comment at the end 1
 		# comment at the end 2
 	`
@@ -186,6 +189,16 @@ func TestNextToken(t *testing.T) {
 
 		{token.IDENT, "d"},
 		{token.SLASH_ASSIGN, "/="},
+		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+
+		{token.INT, "12"},
+		{token.MODULO, "%"},
+		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+
+		{token.IDENT, "f"},
+		{token.MODULO_ASSIGN, "%="},
 		{token.INT, "4"},
 		{token.SEMICOLON, ";"},
 

@@ -30,6 +30,9 @@ func TestEvalIntegerExpression(t *testing.T) {
 		{"3 * 3 * 3 + 10", 37},
 		{"3 * (3 * 3) + 10", 37},
 		{"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
+		{"10 % 5", 0},
+		{"3 % 2", 1},
+		{"10 * 5 % 20", 10},
 	}
 
 	for _, tt := range tests {
@@ -490,6 +493,7 @@ func TestAssignExpressions(t *testing.T) {
 		{"let x = 5; x *= 10; x", 50},
 		{"let x = 20; x /= 10; x", 2},
 		{"let x = 20; x /= 10 / 2; x", 4},
+		{"let x = 20; x %= 10 / 2; x", 0},
 
 		{
 			`
@@ -507,6 +511,13 @@ func TestAssignExpressions(t *testing.T) {
 		},
 		{
 			`
+			let arr = [1,5,3,4];
+			arr[2] %= 2
+			`,
+			1,
+		},
+		{
+			`
 				let hash = {"a": 2};
 				hash["a"] *= 12;
 				hash["a"];
@@ -520,6 +531,14 @@ func TestAssignExpressions(t *testing.T) {
 				hash["a"];
 			`,
 			1,
+		},
+		{
+			`
+				let hash = {"a": 2};
+				hash["a"] %= 2;
+				hash["a"];
+			`,
+			0,
 		},
 	}
 	for _, tt := range tests {
