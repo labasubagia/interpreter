@@ -1,0 +1,38 @@
+{
+	"name": "interpreter",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "interpreter",
+	"workspaceFolder": "/workspace",
+	"shutdownAction": "stopCompose",
+	"forwardPorts": [
+		8501
+	],
+	"remoteUser": "nonroot",
+	"postCreateCommand": "./.devcontainer/postCreatedCommand.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.Go",
+				"usernamehw.errorlens",
+				"eamodio.gitlens",
+				"streetsidesoftware.code-spell-checker",
+				"EditorConfig.EditorConfig",
+				"ms-python.python",
+				"yzhang.markdown-all-in-one"
+			],
+			"settings": {
+				"[go]": {
+					"editor.insertSpaces": false,
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": "always"
+					}
+				},
+				"python.defaultInterpreterPath": "interactive/venv/bin/python3",
+				"[python]": {
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	}
+}

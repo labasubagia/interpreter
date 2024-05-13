@@ -1,12 +1,19 @@
 {
     "cSpell.words": [
+        "azuretools",
         "builtins",
+        "devcontainer",
+        "eamodio",
+        "errorlens",
         "Hashable",
         "integ",
         "labasubagia",
         "newpl",
+        "nonroot",
         "stmts",
-        "untrace"
+        "untrace",
+        "usernamehw",
+        "venv"
     ],
     "files.insertFinalNewline": true
 }
