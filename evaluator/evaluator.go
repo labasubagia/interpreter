@@ -190,7 +190,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
-		return applyFunction(function, args, env)
+		return applyFunction(function, args)
 	case *ast.StringLiteral:
 		return &object.String{Value: node.Value}
 	case *ast.ArrayLiteral:
@@ -232,13 +232,15 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 	return result
 }
 
-func applyFunction(fn object.Object, args []object.Object, env *object.Environment) object.Object {
-	env.Set(scopeFunction, TRUE)
-	defer env.Delete(scopeFunction)
+func applyFunction(fn object.Object, args []object.Object) object.Object {
 
 	switch fn := fn.(type) {
 	case *object.Function:
 		extendedEnv := extendFunctionEnv(fn, args)
+
+		extendedEnv.Set(scopeFunction, TRUE)
+		defer extendedEnv.Delete(scopeFunction)
+
 		evaluated := Eval(fn.Body, extendedEnv)
 		return unwrapReturnValue(evaluated)
 	case *object.Builtin:
