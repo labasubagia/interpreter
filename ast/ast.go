@@ -260,13 +260,18 @@ func (ie *IfExpression) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("if")
+	out.WriteString("(")
 	out.WriteString(ie.Condition.String())
-	out.WriteString(" ")
+	out.WriteString(")")
+	out.WriteString("{")
 	out.WriteString(ie.Consequence.String())
+	out.WriteString("}")
 
 	if ie.Alternative != nil {
-		out.WriteString("else ")
+		out.WriteString("else")
+		out.WriteString("{")
 		out.WriteString(ie.Alternative.String())
+		out.WriteString("}")
 	}
 
 	return out.String()
@@ -481,6 +486,22 @@ func (bs *BreakStatement) TokenLiteral() string {
 	return bs.Token.Literal
 }
 
-func (ie *BreakStatement) String() string {
-	return "break"
+func (bs *BreakStatement) String() string {
+	return bs.Token.Literal
+}
+
+type ContinueStatement struct {
+	Token token.Token
+}
+
+func (cs *ContinueStatement) statementNode() {
+
+}
+
+func (cs *ContinueStatement) TokenLiteral() string {
+	return cs.Token.Literal
+}
+
+func (cs *ContinueStatement) String() string {
+	return cs.Token.Literal
 }

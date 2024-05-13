@@ -8,10 +8,17 @@ import (
 	"github.com/labasubagia/interpreter/object"
 )
 
+const (
+	scopeLoop     = "__SCOPE_LOOP__"
+	scopeFunction = "__SCOPE_FUNCTION__"
+)
+
 var (
-	NULL  = &object.Null{}
-	TRUE  = &object.Boolean{Value: true}
-	FALSE = &object.Boolean{Value: false}
+	NULL     = &object.Null{}
+	TRUE     = &object.Boolean{Value: true}
+	FALSE    = &object.Boolean{Value: false}
+	BREAK    = &object.Break{}
+	CONTINUE = &object.Continue{}
 )
 
 var builtins = map[string]*object.Builtin{
@@ -150,6 +157,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.WhileStatement:
 		return evalWhileStatement(node, env)
+	case *ast.BreakStatement:
+		return BREAK
+	case *ast.ContinueStatement:
+		return CONTINUE
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
@@ -179,7 +190,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
-		return applyFunction(function, args)
+		return applyFunction(function, args, env)
 	case *ast.StringLiteral:
 		return &object.String{Value: node.Value}
 	case *ast.ArrayLiteral:
@@ -221,7 +232,9 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 	return result
 }
 
-func applyFunction(fn object.Object, args []object.Object) object.Object {
+func applyFunction(fn object.Object, args []object.Object, env *object.Environment) object.Object {
+	env.Set(scopeFunction, TRUE)
+	defer env.Delete(scopeFunction)
 
 	switch fn := fn.(type) {
 	case *object.Function:
@@ -315,7 +328,8 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 
 		if result != nil {
 			rt := result.Type()
-			if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ {
+			switch rt {
+			case object.RETURN_VALUE_OBJ, object.BREAK_OBJ, object.CONTINUE_OBJ, object.ERROR_OBJ:
 				return result
 			}
 		}
@@ -611,6 +625,12 @@ func evalHashIndexAssignExpression(
 }
 
 func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) object.Object {
+	fnScope, _ := env.Get(scopeFunction)
+
+	env = object.NewEnclosedEnvironment(env)
+
+	env.Set(scopeLoop, TRUE)
+	defer env.Delete(scopeLoop)
 
 	condition := Eval(node.Condition, env)
 	if isError(condition) {
@@ -621,7 +641,21 @@ func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) objec
 		stmt := evalBlockStatement(node.Body, env)
 		if stmt != nil {
 			switch stmt.Type() {
-			case object.RETURN_VALUE_OBJ, object.ERROR_OBJ:
+			case object.BREAK_OBJ:
+				return NULL
+			case object.CONTINUE_OBJ:
+				condition = Eval(node.Condition, env)
+				if isError(condition) {
+					return condition
+				}
+				continue
+			case object.RETURN_VALUE_OBJ:
+				if fnScope == TRUE {
+					return stmt
+				} else {
+					return newError("return statement unsupported if while-loop not inside a function")
+				}
+			case object.ERROR_OBJ:
 				return stmt
 			}
 		}
@@ -631,7 +665,7 @@ func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) objec
 			return condition
 		}
 	}
-	return NULL
+	return nil
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

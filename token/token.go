@@ -57,18 +57,22 @@ const (
 	STRING   = "STRING"
 	NULL     = "NULL"
 	WHILE    = "WHILE"
+	BREAK    = "BREAK"
+	CONTINUE = "CONTINUE"
 )
 
 var keywords = map[string]TokenType{
-	"fn":     FUNCTION,
-	"let":    LET,
-	"return": RETURN,
-	"if":     IF,
-	"else":   ELSE,
-	"true":   TRUE,
-	"false":  FALSE,
-	"null":   NULL,
-	"while":  WHILE,
+	"fn":       FUNCTION,
+	"let":      LET,
+	"return":   RETURN,
+	"if":       IF,
+	"else":     ELSE,
+	"true":     TRUE,
+	"false":    FALSE,
+	"null":     NULL,
+	"while":    WHILE,
+	"break":    BREAK,
+	"continue": CONTINUE,
 }
 
 func LookupIdent(ident string) TokenType {

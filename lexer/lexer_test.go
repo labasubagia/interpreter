@@ -54,6 +54,19 @@ func TestNextToken(t *testing.T) {
 		12 % 4;
 		f %= 4;
 
+		break;
+		continue;
+
+		while (2 == 2) {
+			let x = 12;
+			let y = 4;
+			if (x > 2) {
+				break;
+			}
+			puts("ok");
+		}
+		z;
+
 		# comment at the end 1
 		# comment at the end 2
 	`
@@ -62,6 +75,7 @@ func TestNextToken(t *testing.T) {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
+
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
@@ -200,6 +214,56 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "f"},
 		{token.MODULO_ASSIGN, "%="},
 		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+
+		{token.BREAK, "break"},
+		{token.SEMICOLON, ";"},
+
+		{token.CONTINUE, "continue"},
+		{token.SEMICOLON, ";"},
+
+		// while
+		{token.WHILE, "while"},
+		{token.LPAREN, "("},
+		{token.INT, "2"},
+		{token.EQ, "=="},
+		{token.INT, "2"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+
+		{token.LET, "let"},
+		{token.IDENT, "x"},
+		{token.ASSIGN, "="},
+		{token.INT, "12"},
+		{token.SEMICOLON, ";"},
+
+		{token.LET, "let"},
+		{token.IDENT, "y"},
+		{token.ASSIGN, "="},
+		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+
+		{token.IF, "if"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.GT, ">"},
+		{token.INT, "2"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.BREAK, "break"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+
+		{token.IDENT, "puts"},
+		{token.LPAREN, "("},
+		{token.STRING, "ok"},
+		{token.RPAREN, ")"},
+		{token.SEMICOLON, ";"},
+
+		{token.RBRACE, "}"},
+		// end while
+
+		{token.IDENT, "z"},
 		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},

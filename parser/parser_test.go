@@ -804,14 +804,49 @@ func TestParsingWhileStatement(t *testing.T) {
 			"while(true){}",
 		},
 		{
-
+			"while (true) {break;}",
+			"while(true){break}",
+		},
+		{
+			"while (false) {continue;}",
+			"while(false){continue}",
+		},
+		{
 			`
 				while (2 == 2) {
 					let x = 12;
 					let y = 4;
 				}
+				print(x);
 			`,
 			"while((2 == 2)){let x = 12;let y = 4;}",
+		},
+		{
+			`
+				while (2 == 2) {
+					let x = 12;
+					let y = 4;
+					if (x > 2) {
+						break;
+					}
+				}
+				z;
+			`,
+			"while((2 == 2)){let x = 12;let y = 4;if((x > 2)){break}}",
+		},
+		{
+			`
+				while(x){
+					let x=12;
+					if (y==2) {
+						break;
+					} else {
+						continue;
+					}
+				}
+				n;
+			`,
+			"while(x){let x = 12;if((y == 2)){break}else{continue}}",
 		},
 	}
 

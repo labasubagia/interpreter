@@ -306,6 +306,20 @@ func TestErrorHandling(t *testing.T) {
 			`,
 			"unsupported assign HASH[STRING] -> INTEGER += STRING",
 		},
+
+		{
+			`
+				let x = 0;
+				while (true) {
+					x = x + 1;
+					if (x > 4) {
+						return null;
+					}
+				}
+				x;
+			`,
+			"return statement unsupported if while-loop not inside a function",
+		},
 	}
 
 	for _, tt := range tests {
@@ -918,7 +932,7 @@ func TestWhileStatement(t *testing.T) {
 				while (x < 0) {
 					x = x + 1;
 				}
-				x
+				x;
 			`,
 			0,
 		},
@@ -928,9 +942,34 @@ func TestWhileStatement(t *testing.T) {
 				while (x < 5) {
 					x = x + 1;
 				}
-				x
+				x;
 			`,
 			5,
+		},
+		{
+			`
+				let x = 0;
+				while (x < 5) {
+					x = x + 1;
+					break;
+				}
+				x;
+			`,
+			1,
+		},
+		{
+			`
+				let x = 0;
+				let y = 0;
+				while (x < 5) {
+					x = x + 1;
+					y -= 1;
+					continue;
+					y += 1;
+				}
+				y;
+			`,
+			-5,
 		},
 		{
 			`
@@ -943,9 +982,37 @@ func TestWhileStatement(t *testing.T) {
 						}
 					}
 				}()
-				x
+				x;
 			`,
 			5,
+		},
+		{
+			`
+				let x = 0;
+				while (true) {
+					x = x + 1;
+					if (x >= 5) {
+						break;
+					}
+				}
+				x;
+			`,
+			5,
+		},
+		{
+			`
+				let x = 0;
+				let y = 0;
+				while (x < 5) {
+					x += 1;
+					if (x > 3) {
+						continue
+					}
+					y += 1;
+				}
+				y;
+			`,
+			3,
 		},
 	}
 

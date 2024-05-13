@@ -29,6 +29,13 @@ func (e *Environment) Set(name string, val Object) Object {
 	return val
 }
 
+func (e *Environment) Delete(name string) {
+	if _, ok := e.store[name]; !ok {
+		return
+	}
+	delete(e.store, name)
+}
+
 // Assign only if exists anywhere in inner or outer env
 func (e *Environment) Assign(name string, val Object) (value Object, found bool) {
 	env := e
