@@ -646,11 +646,7 @@ func evalWhileStatement(node *ast.WhileStatement, env *object.Environment, scope
 			case object.BREAK_OBJ:
 				return NULL
 			case object.CONTINUE_OBJ:
-				condition = Eval(node.Condition, env, ScopeLoop)
-				if isError(condition) {
-					return condition
-				}
-				continue
+				// Do Nothing, statements already stopped inside evalBlockStatement
 			case object.RETURN_VALUE_OBJ:
 				if scope == ScopeFunction {
 					return stmt
@@ -667,7 +663,7 @@ func evalWhileStatement(node *ast.WhileStatement, env *object.Environment, scope
 			return condition
 		}
 	}
-	return nil
+	return NULL
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

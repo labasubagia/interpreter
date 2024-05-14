@@ -320,6 +320,10 @@ func TestErrorHandling(t *testing.T) {
 			`,
 			"return statement unsupported if while-loop not inside a function",
 		},
+		{
+			"while(x) {x += 1};",
+			"identifier not found: x",
+		},
 
 		{
 			`
@@ -1050,6 +1054,21 @@ func TestWhileStatement(t *testing.T) {
 				y;
 			`,
 			3,
+		},
+		{
+			`
+				let x = 0;
+				let y = 0;
+				while (x < 5) {
+					x += 1;
+					if (true) {
+						continue
+					}
+					y += 1;
+				}
+				y;
+			`,
+			0,
 		},
 	}
 
