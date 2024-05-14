@@ -23,7 +23,7 @@ func eval(input string) {
 			fmt.Printf("error parse-%d: %s\n", i, e)
 		}
 	}
-	obj := evaluator.Eval(program, env)
+	obj := evaluator.Eval(program, env, evaluator.ScopeNone)
 	if obj != nil && obj.Type() == object.ERROR_OBJ {
 		fmt.Println(obj.Inspect())
 	}

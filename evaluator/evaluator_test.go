@@ -320,6 +320,43 @@ func TestErrorHandling(t *testing.T) {
 			`,
 			"return statement unsupported if while-loop not inside a function",
 		},
+
+		{
+			`
+				fn() {
+					x;
+				}()
+			`,
+			"identifier not found: x",
+		},
+		{
+			`
+				fn() {
+					break;
+				}()
+			`,
+			"invalid keyword inside function: BREAK",
+		},
+		{
+			`
+				fn() {
+					continue;
+				}()
+			`,
+			"invalid keyword inside function: CONTINUE",
+		},
+
+		{
+			`	let i = 0;
+				while (i < 5) {
+					fn() {
+						continue;
+					}()
+					i += 1;
+				}
+			`,
+			"invalid keyword inside function: CONTINUE",
+		},
 	}
 
 	for _, tt := range tests {
@@ -1033,7 +1070,7 @@ func testEval(input string) object.Object {
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
 
-	return Eval(program, env)
+	return Eval(program, env, ScopeNone)
 }
 
 func testNullObject(t *testing.T, obj object.Object) bool {
