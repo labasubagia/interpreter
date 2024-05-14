@@ -24,7 +24,7 @@ func eval(input string) {
 		}
 	}
 	obj := evaluator.Eval(program, env)
-	if obj.Type() == object.ERROR_OBJ {
+	if obj != nil && obj.Type() == object.ERROR_OBJ {
 		fmt.Println(obj.Inspect())
 	}
 }
