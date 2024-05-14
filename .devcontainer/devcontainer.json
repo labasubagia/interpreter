@@ -21,6 +21,7 @@
 				"yzhang.markdown-all-in-one"
 			],
 			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
 				"[go]": {
 					"editor.insertSpaces": false,
 					"editor.formatOnSave": true,

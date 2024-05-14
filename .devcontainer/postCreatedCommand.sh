@@ -13,3 +13,10 @@ cd ..
 
 # other tools
 pre-commit
+
+
+if [[ "${CODESPACES}" == true ]]; then
+  echo "Fixing directory ownership for GitHub Codespaces..." >&2
+  sudo chown -R nonroot:nonroot /home/nonroot
+  sudo chown -R nonroot:nonroot /workspace
+fi
